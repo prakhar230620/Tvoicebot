@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --background: #000000;
+            --foreground: #ffffff;
+            --accent: #0066ff;
+            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #003399 100%);
+            --gradient-secondary: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes soundBars {
+            0% { height: 10%; }
+            50% { height: 100%; }
+            100% { height: 10%; }
+        }
+
+        body {
+            background: linear-gradient(31deg, #000000 20%, #00b7ff 4%, #0008ff 40%, #152c28 60%, #3d3991 70%, #000000 50%);
+            color: var(--foreground);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            border: 2px solid #000000;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 255, 0.2);
+            animation: slideIn 1s ease;
+        }
+
+        .chat-container:hover {
+            transform: translateY(-5px);
+            box-shadow:
+            0 10px 20px rgba(0, 0, 0, 0.5),
+            0 6px 6px rgba(0, 0, 0, 0.6),
+            inset 0 0 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(55deg, #000000 50%, #051eff 50%,#000000 40%,#051eff 25%);
+            backdrop-filter: blur(5px);
+            border:2px solid #000000;
+
+        }
+
+        .chat-header {
+            background: linear-gradient(89deg, #000000 50%, #0011ff 100% );
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #9f9b9b;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 80%;
+            background: linear-gradient(90deg,#000000 5%, #0008ff 100%);
+            padding: 15px;
+            border-radius: 15px;
+            line-height: 1.4;
+            animation: slideIn 0.3s ease;
+        }
+
+        .bot-message {
+
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .voice-controls {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .mic-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .mic-button.active {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #ff0000 0%, #38030365 100%);
+        }
+
+        .voice-bars {
+            display: flex;
+            gap: 3px;
+            height: 30px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-bars span {
+            width: 3px;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            animation: soundBars 0.5s infinite;
+            animation-play-state: paused;
+        }
+
+        .voice-bars.active span {
+            animation-play-state: running;
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #000000;
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #00f2ff, #051eff);
+            border: 1px solid #1a1a1a;
+            box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #00ff0d;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Voice Assistant</h1>
+            <div class="voice-bars" id="voice-bars">
+                <span></span><span></span><span></span>
+                <span></span><span></span>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                Click the microphone to start speaking.
+            </div>
+        </div>
+
+        <div class="voice-controls">
+            <button class="mic-button" id="mic-button">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <p class="status-text" id="status-text">Click to start speaking</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const micButton = document.getElementById('mic-button');
+        const statusText = document.getElementById('status-text');
+        const messagesContainer = document.getElementById('chat-messages');
+        const voiceBars = document.getElementById('voice-bars');
+
+        let isListening = false;
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('message', (data) => {
+            addMessage(data.text, data.isUser);
+        });
+
+        micButton.addEventListener('click', () => {
+            if (!isListening) {
+                startListening();
+            } else {
+                stopListening();
+            }
+        });
+
+        function startListening() {
+            isListening = true;
+            micButton.classList.add('active');
+            voiceBars.classList.add('active');
+            statusText.textContent = 'Listening...';
+            socket.emit('start_recording');
+        }
+
+        function stopListening() {
+            isListening = false;
+            micButton.classList.remove('active');
+            voiceBars.classList.remove('active');
+            statusText.textContent = 'Click to start speaking';
+            socket.emit('stop_recording');
+        }
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
