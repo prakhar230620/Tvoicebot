@@ -11,13 +11,13 @@ def validate_session(f):
 
         if not user_id:
             # No user_id found, redirect to main app login
-            return redirect('http://localhost:5000/login')
+            return redirect('https://toolminesai.in/login')
 
         # Validate user against shared database
         user = User.get_user_by_email(user_id)
         if not user:
             # User not found in database, redirect to main app login
-            return redirect('http://localhost:5000/login')
+            return redirect('https://toolminesai.in/login')
 
         # Store user data in session
         session['user_id'] = user.email
